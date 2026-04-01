@@ -54,7 +54,7 @@ int main() {
     load_task();
     int status = 0;
 
-#if 0
+#if 1
     // ------ 进程非阻塞式等待方式 -----
     // 这里需要加个循环！
     // 进程是非阻塞式等待方式，需要轮询子进程的状态，检测子进程是否退出了
@@ -95,7 +95,7 @@ int main() {
             printf("exit code: %d\n", WEXITSTATUS(status));
         } else {
             // TODO
-            printf("child exit not normal!\n");
+            printf("child process exit not normal!\n");
         }
         printf("wait success, exit code: %d, sig: %d\n", (status >> 8) & 0xFF, status & 0x7F);
     }
