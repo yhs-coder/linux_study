@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,8 +81,18 @@ void test02() {
     printf("-----------------------\n");
 }
 
+// ---------- 文件操作相关的系统调用接口 ----------
+void test03() {
+    int fd = open("test.log", O_WRONLY | O_CREAT, 0666);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+}
+
 int main() {
     // test01();
-    test02();
+    // test02();
+    test03();
     return 0;
 }
