@@ -83,6 +83,10 @@ void test02() {
 
 // ---------- 文件操作相关的系统调用接口 ----------
 void test03() {
+    printf("stdin->fd: %d\n", stdin->_fileno);
+    printf("stdout->fd: %d\n", stdout->_fileno);
+    printf("stderr->fd: %d\n", stderr->_fileno);
+    umask(0);
     int fd = open("test.log", O_WRONLY | O_CREAT, 0666);
     if (fd < 0) {
         perror("open");
