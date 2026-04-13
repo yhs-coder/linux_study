@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 // #define FILE_NAME(number) "log.txt" #number
 #define FILE_NAME "log.txt"
+#define LOG_NAME(number) "log.txt" #number
 
 // 每一个宏，对应的数值，只有一个比特位是1，彼此位置不重叠
 #define ONE (1 << 0)
@@ -94,9 +97,30 @@ void test03() {
     }
 }
 
+void test04() {
+    int fd0 = open(LOG_NAME(1), O_WRONLY | O_CREAT | O_APPEND, 0666);
+    int fd1 = open(LOG_NAME(2), O_WRONLY | O_CREAT | O_APPEND, 0666);
+    int fd2 = open(LOG_NAME(3), O_WRONLY | O_CREAT | O_APPEND, 0666);
+    int fd3 = open(LOG_NAME(4), O_WRONLY | O_CREAT | O_APPEND, 0666);
+    int fd4 = open(LOG_NAME(5), O_WRONLY | O_CREAT | O_APPEND, 0666);
+
+    printf("fd: %d\n", fd0);
+    printf("fd: %d\n", fd1);
+    printf("fd: %d\n", fd2);
+    printf("fd: %d\n", fd3);
+    printf("fd: %d\n", fd4);
+
+    close(fd0);
+    close(fd1);
+    close(fd2);
+    close(fd3);
+    close(fd4);
+}
+
 int main() {
     // test01();
     // test02();
-    test03();
+    // test03();
+    test04();
     return 0;
 }
