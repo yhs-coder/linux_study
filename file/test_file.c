@@ -86,17 +86,55 @@ void test02() {
 
 // ---------- 文件操作相关的系统调用接口 ----------
 void test03() {
-    printf("stdin->fd: %d\n", stdin->_fileno);
-    printf("stdout->fd: %d\n", stdout->_fileno);
-    printf("stderr->fd: %d\n", stderr->_fileno);
+#if 0
+    // ------- 写文件 -------
+    // 自定义创建文件的掩码
     umask(0);
-    int fd = open("test.log", O_WRONLY | O_CREAT, 0666);
+    // int fd = open("test.log", O_WRONLY | O_CREAT, 0666);
+    // C语言打开文件时的 "w"方式 == 系统调用中的 O_WRONLY | O_CREAT | O_TRUNC
+    int fd = open("test.log", O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd < 0) {
         perror("open");
         exit(1);
     }
+
+    int count = 5;
+    char buffer[64];
+    while (count) {
+        // sprintf(buffer, "%s:%d\n", "hello world", count--);
+        sprintf(buffer, "%s:%d\n", "hello C++", count--);
+        // 向文件中写入string的时候，要不要+1 --> no!
+        // 写入文件时，不要strlen(buffer) + 1,这样做会将C语言字符串的'\0'结束符写入文件中
+        // C语言字符串的结束字符'\0'，和文件没有关系
+        // write(fd, buffer, strlen(buffer) + 1);
+        write(fd, buffer, strlen(buffer));
+    }
+#else
+    // ------- 读文件 -------
+    // 自定义创建文件的掩码
+    umask(0);
+    int fd = open("test.log", O_RDONLY);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    char buffer[1024];
+    // 这里从文件读取sizeof(buffer) - 1字节，-1是为了留一个字符给'\0'
+    while (1) {
+        ssize_t num = read(fd, buffer, sizeof(buffer) - 1);
+        if (num > 0) {
+            buffer[num] = 0;
+            printf("%s", buffer);
+        } else {
+            break;
+        }
+    }
+#endif
+    close(fd);
 }
 
+// ---------- 批量创建文件，观察文件描述符增长 ----------
 void test04() {
     int fd0 = open(LOG_NAME(1), O_WRONLY | O_CREAT | O_APPEND, 0666);
     int fd1 = open(LOG_NAME(2), O_WRONLY | O_CREAT | O_APPEND, 0666);
@@ -104,6 +142,9 @@ void test04() {
     int fd3 = open(LOG_NAME(4), O_WRONLY | O_CREAT | O_APPEND, 0666);
     int fd4 = open(LOG_NAME(5), O_WRONLY | O_CREAT | O_APPEND, 0666);
 
+    printf("stdin->fd: %d\n", stdin->_fileno);
+    printf("stdout->fd: %d\n", stdout->_fileno);
+    printf("stderr->fd: %d\n", stderr->_fileno);
     printf("fd: %d\n", fd0);
     printf("fd: %d\n", fd1);
     printf("fd: %d\n", fd2);
@@ -120,7 +161,7 @@ void test04() {
 int main() {
     // test01();
     // test02();
-    // test03();
-    test04();
+    test03();
+    // test04();
     return 0;
 }
