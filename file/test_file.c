@@ -158,10 +158,48 @@ void test04() {
     close(fd4);
 }
 
+// ---------- 文件描述符分配规则 ----------
+void test05() {
+    umask(0);
+    // close(0);
+    close(1);
+    // close(2);
+    int fd = open("test.log", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+    printf("open fd: %d\n", fd);
+    fprintf(stdout, "open fd: %d\n", fd);
+    fflush(stdout);
+    close(fd);
+}
+
+// ---------- 重定向----------
+void test06() {
+    umask(0);
+
+    int fd = open("test.log", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+    int fd2 = open("test.log", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    int retfd = dup2(fd, 1);
+    
+    printf("open fd: %d\n", fd);
+    printf("open fd2: %d\n", fd2);
+    fprintf(stdout, "retfd fd: %d\n", retfd);
+    fflush(stdout);
+    close(fd);
+}
+
 int main() {
     // test01();
     // test02();
-    test03();
+    // test03();
     // test04();
+    // test05();
+    test06();
     return 0;
 }
