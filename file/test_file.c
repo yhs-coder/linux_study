@@ -175,7 +175,7 @@ void test05() {
     close(fd);
 }
 
-// ---------- 重定向----------
+// ---------- 输出重定向----------
 void test06() {
     umask(0);
 
@@ -186,11 +186,54 @@ void test06() {
     }
     int fd2 = open("test.log", O_WRONLY | O_CREAT | O_TRUNC, 0666);
     int retfd = dup2(fd, 1);
-    
+
     printf("open fd: %d\n", fd);
     printf("open fd2: %d\n", fd2);
     fprintf(stdout, "retfd fd: %d\n", retfd);
     fflush(stdout);
+    close(fd);
+}
+
+// ---------- 追加重定向----------
+void test07() {
+    umask(0);
+
+    int fd = open("test.log", O_WRONLY | O_CREAT | O_APPEND, 0666);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    dup2(fd, 1);
+
+    printf("open fd: %d\n", fd);
+    fprintf(stdout, "open fd: %d\n", fd);
+
+    const char* msg = "hello world";
+    write(1, msg, strlen(msg));
+
+    fflush(stdout);
+    close(fd);
+}
+
+// ---------- 输入重定向----------
+void test08() {
+    umask(0);
+
+    int fd = open("test.log", O_RDONLY);
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
+    dup2(fd, 0);
+    char line[64];
+    while (1) {
+        if (fgets(line, sizeof(line), stdin) == NULL) {
+            break;
+        }
+        printf("< ");
+        printf("%s", line);
+    }
     close(fd);
 }
 
@@ -200,6 +243,8 @@ int main() {
     // test03();
     // test04();
     // test05();
-    test06();
+    // test06();
+    // test07();
+    test08();
     return 0;
 }
